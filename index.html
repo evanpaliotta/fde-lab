@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<title>Deploy Lab — the business model, offer &amp; FDE playbook</title>
+<style>
+:root{
+  --ink:#141715; --ink-2:#2c332e; --muted:#6a756d; --paper:#f3f0e7; --card:#fffdf7;
+  --line:#d9d7c9; --acid:#c9f06b; --clay:#b8562f; --moss:#1d4a3f; --sand:#e9e5d6;
+  --shadow:0 18px 44px rgba(20,35,28,.07);
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--moss);text-underline-offset:3px;text-decoration-thickness:1px}
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-.02em;margin:0}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:40;background:rgba(243,240,231,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:14px;height:58px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.94rem;letter-spacing:-.01em;white-space:nowrap}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--clay);box-shadow:0 0 0 4px rgba(184,86,47,.14)}
+.brand span.sub{font-weight:400;color:var(--muted);font-size:.78rem}
+.spacer{flex:1}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--ink-2);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:600;white-space:nowrap}
+.tab:hover{background:#fff;border-color:var(--line)}
+.tab[aria-selected="true"]{background:var(--ink);color:#f7f5ec;border-color:var(--ink)}
+
+/* panel shells */
+.page{display:none;padding:40px 0 80px}
+.page.active{display:block}
+.kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);font-weight:600}
+.page h1{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.05;margin:10px 0 14px}
+.lede{max-width:64ch;color:var(--ink-2);font-size:1.02rem}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.panel h3{font-size:1.05rem;margin-bottom:6px}
+.panel p{margin:.45em 0;color:var(--ink-2);font-size:.92rem}
+.mono{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:10px;margin:34px 0 18px;flex-wrap:wrap}
+.sechead h2{font-size:1.4rem}
+.sechead .note{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+ul.tight{margin:.4em 0 0;padding-left:1.15em}
+ul.tight li{margin:.3em 0;color:var(--ink-2);font-size:.92rem}
+.flag{display:inline-block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:99px;border:1px solid var(--line);background:var(--sand);color:var(--ink-2);font-weight:700}
+.flag.red{background:#f6e3da;border-color:#e5c4b3;color:#8a3d1d}
+.flag.green{background:#e4efc9;border-color:#c9df9a;color:#43591b}
+.rule{font-family:var(--mono);font-size:.8rem;background:#e8ecd9;border-left:3px solid var(--moss);padding:11px 14px;border-radius:6px;color:#26302a}
+.warn{font-family:var(--mono);font-size:.8rem;background:#f6e3da;border-left:3px solid var(--clay);padding:11px 14px;border-radius:6px;color:#6e2f13}
+
+/* loop diagram */
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 4px}
+.loop .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 15px;position:relative}
+.loop .step b{display:block;font-family:Georgia,serif;font-size:1rem;margin-bottom:4px}
+.loop .step span{font-size:.8rem;color:var(--ink-2)}
+.loop .step .n{position:absolute;top:-9px;left:12px;background:var(--ink);color:#f7f5ec;font-family:var(--mono);font-size:.62rem;padding:2px 7px;border-radius:99px;letter-spacing:.06em}
+.loop .step .fee{display:block;margin-top:8px;font-family:var(--mono);font-size:.72rem;color:var(--clay);font-weight:700}
+@media(max-width:760px){.loop{grid-template-columns:repeat(2,1fr)}}
+
+/* offer ladder */
+.ladder{display:grid;gap:12px}
+.rung{display:grid;grid-template-columns:150px 1fr 170px;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);align-items:start}
+.rung .tag{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.rung h3{font-size:1.1rem;margin-top:2px}
+.rung .price{text-align:right}
+.rung .price b{display:block;font-family:Georgia,serif;font-size:1.25rem;color:var(--moss);line-height:1.1}
+.rung .price span{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+@media(max-width:760px){.rung{grid-template-columns:1fr}.rung .price{text-align:left}}
+
+/* verticals */
+.vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(470px,1fr));gap:14px}
+@media(max-width:1040px){.vcards{grid-template-columns:1fr}}
+.vcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+.vcard h3{font-size:1.08rem;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.vcard .who{font-size:.8rem;color:var(--muted);margin:4px 0 8px;font-family:var(--mono)}
+.uc{border-top:1px dashed var(--line);padding:8px 0;font-size:.88rem}
+.uc b{color:var(--ink)}
+.uc .arrow{color:var(--clay);font-weight:700}
+table.cmp{width:100%;border-collapse:collapse;font-size:.85rem;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+table.cmp th,table.cmp td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.cmp th{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--sand)}
+table.cmp tr:last-child td{border-bottom:none}
+.dotrow{display:inline-flex;gap:3px}
+.dotrow i{width:9px;height:9px;border-radius:50%;background:var(--sand);display:inline-block}
+.dotrow i.on{background:var(--moss)}
+
+/* playbook */
+.pr{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.pr:first-of-type{border-top:none}
+.pr .num{font-family:var(--mono);color:var(--clay);font-weight:700;font-size:.85rem;padding-top:2px}
+.pr b{display:block;font-size:.97rem}
+.pr p{margin:2px 0 0;color:var(--ink-2);font-size:.9rem}
+.srcs{font-size:.8rem;color:var(--ink-2)}
+.srcs li{margin:.35em 0}
+@media print{.bar{display:none}.page{display:block!important;padding:10px 0}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>Deploy Lab <span class="sub">— Jacksonville · working notes</span></div>
+    <div class="spacer"></div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-page="model">Model</button>
+      <button class="tab" role="tab" aria-selected="false" data-page="offer">Offer</button>
+      <button class="tab" role="tab" aria-selected="false" data-page="delivery">Delivery</button>
+      <button class="tab" role="tab" aria-selected="false" data-page="gtm">Positioning &amp; GTM</button>
+      <button class="tab" role="tab" aria-selected="false" data-page="verticals">Verticals</button>
+      <button class="tab" role="tab" aria-selected="false" data-page="fde">FDE Playbook</button>
+    </nav>
+  </div>
+</div>
+
+<!-- ============ MODEL ============ -->
+<main class="page active" id="page-model">
+<div class="wrap">
+  <div class="kicker">The business model</div>
+  <h1>Deploy systems for local businesses.<br>Get paid three times for the same relationship.</h1>
+  <p class="lede">The internal job title is forward-deployed engineer: embed in the business, find the expensive repetitive work, ship a working system, stay on to run it. Externally it never gets called that — the customer just buys an assessment, a deployment, and a care plan.</p>
+
+  <div class="loop" style="margin-top:26px">
+    <div class="step"><span class="n">01</span><b>Assessment</b><span>Map how the business actually runs. Find the 3–5 most expensive repetitive workflows. Rank by hours lost and money leaked.</span><span class="fee">paid · 1 week</span></div>
+    <div class="step"><span class="n">02</span><b>Deployment</b><span>One workflow, fixed scope, fixed price. A system running in their business with an acceptance test — not a proposal.</span><span class="fee">one-time · 2–4 wks</span></div>
+    <div class="step"><span class="n">03</span><b>Care plan</b><span>The system is monitored, maintained, and improved. A monthly number proving it works. The recurring piece.</span><span class="fee">monthly</span></div>
+    <div class="step"><span class="n">04</span><b>Expansion</b><span>Next use case = a new fixed-price deployment. The relationship compounds; the pricing never blurs into hourly.</span><span class="fee">pay again</span></div>
+  </div>
+
+  <div class="sechead"><h2>Rules of the model</h2><span class="note">non-negotiables</span></div>
+  <div class="grid g3">
+    <div class="panel"><h3>Fixed price, always</h3><p>No hourly. Hourly sells the calendar; fixed price sells the outcome and keeps scope honest. A small fixed job done well beats a big fuzzy one.</p></div>
+    <div class="panel"><h3>Diagnosis is paid</h3><p>Never free discovery. Free assessments attract tire-kickers and give away the sharpest thinking. The assessment is a real product with a real deliverable.</p></div>
+    <div class="panel"><h3>Buyer is the owner</h3><p>Small businesses don't have COOs. Sell to the person who signs, feels the pain daily, and can say yes in one meeting. No procurement, no decks.</p></div>
+    <div class="panel"><h3>One workflow at a time</h3><p>Deploy one thing, make it work, earn the next. Expansion is a feature of the model: every new use case is a fresh scoped quote, not scope creep on the last one.</p></div>
+    <div class="panel"><h3>Geography is the moat</h3><p>Jacksonville / NE Florida first. Show up in person, sit in the office, know the names. Local trust is the thing an out-of-market competitor can't copy.</p></div>
+    <div class="panel"><h3>Retainer follows production</h3><p>A care plan only exists after something is live. It's tied to a running system and a monthly number — never sold as "availability."</p></div>
+  </div>
+
+  <div class="sechead"><h2>What this is not</h2><span class="note">drift guards</span></div>
+  <div class="grid g2">
+    <div class="panel"><p><b>Not a lead-gen agency.</b> No selling leads or rankings. The deliverable is a system inside their operation.</p></div>
+    <div class="panel"><p><b>Not a marketing agency.</b> Funnels and ads are someone else's business. The entry point is operations, not marketing.</p></div>
+    <div class="panel"><p><b>Not hourly consulting.</b> The moment billing becomes hours, the model is dead. Fixed scope or nothing.</p></div>
+    <div class="panel"><p><b>Not staff augmentation.</b> Never become "your part-time IT guy." You ship systems with an owner on their side and a runbook, then step back.</p></div>
+  </div>
+
+  <div class="rule" style="margin-top:22px">One sentence: <b>they pay once to see the problem clearly, once to fix it, and monthly to keep it fixed.</b> Everything else in this document serves that sentence.</div>
+</div>
+</main>
+
+<!-- ============ OFFER ============ -->
+<main class="page" id="page-offer">
+<div class="wrap">
+  <div class="kicker">The offer</div>
+  <h1>Four rungs, priced for owner-buyers</h1>
+  <p class="lede">Small-business prices: low enough that an owner can say yes without a board meeting, real enough that free-seekers filter themselves out. Ranges are starting points — tune after the first three engagements, not before.</p>
+
+  <div class="ladder" style="margin-top:26px">
+    <div class="rung">
+      <div><span class="tag">Step 0 · free</span><h3>The owner call</h3></div>
+      <div><p>30 minutes. Qualification only: what the business runs on, where the day hurts, whether there's a budget line. <b>No audit, no recommendations.</b> Ends with an X-ray offer or an honest "not a fit."</p></div>
+      <div class="price"><b>$0</b><span>30 min · video or on-site</span></div>
+    </div>
+    <div class="rung">
+      <div><span class="tag">Step 1 · paid</span><h3>Ops X-ray</h3></div>
+      <div><p>~1 week. Sit in the actual workflow, then deliver: a one-page map of how work currently flows, the 3–5 most expensive repetitive workflows ranked by hours lost and money leaked, and a fixed-price quote for the top one. <b>100% credited toward the first deployment.</b> They own it even if they walk.</p></div>
+      <div class="price"><b>$750–1,500</b><span>~1 week · credited</span></div>
+    </div>
+    <div class="rung">
+      <div><span class="tag">Step 2 · one-time</span><h3>Deployment</h3></div>
+      <div><p>One workflow, fixed scope, fixed price, 2–4 weeks. Ships with an agreed acceptance test, a fallback for when it breaks, and someone on their side trained to own it. Done means: running in their business, not demoed on a call.</p></div>
+      <div class="price"><b>$2,500–7,500</b><span>2–4 weeks · fixed scope</span></div>
+    </div>
+    <div class="rung">
+      <div><span class="tag">Step 3 · monthly</span><h3>Care plan</h3></div>
+      <div><p>The deployed system stays healthy: monitoring, fixes, small changes (capped hours), and one monthly page with the number that matters — calls answered, quotes out the door in minutes, AR days down. Cancel anytime; the system keeps running.</p></div>
+      <div class="price"><b>$300–800/mo</b><span>capped scope · month-to-month</span></div>
+    </div>
+  </div>
+
+  <div class="sechead"><h2>Expansion = pay again</h2><span class="note">the compounding loop</span></div>
+  <div class="grid g2">
+    <div class="panel"><h3>How the second yes happens</h3><p>The X-ray ranked 3–5 workflows; deployment #1 shipped the top one. A month into the care plan, the monthly page shows the win in numbers. The next workflow down the ranked list is now an easy conversation: <i>"Remember item two on your X-ray? $3,800, three weeks, here's what changes."</i></p></div>
+    <div class="panel"><h3>Why this pricing discipline matters</h3><p>Each use case is priced fresh — never folded into an existing retainer "as a favor." Retainers that quietly absorb new builds become free labor in month four. The care plan covers the <b>running</b> system; new capability is always a new quote.</p></div>
+  </div>
+
+  <div class="sechead"><h2>Pricing guardrails</h2><span class="note">from the field</span></div>
+  <div class="grid g2">
+    <div class="panel"><ul class="tight">
+      <li><b>X-ray fee credits 100%</b> into the first deployment — makes the yes easy without making it free.</li>
+      <li><b>Never quote a deployment without an X-ray</b> (or an equivalent existing map). Fixed price on fuzzy scope is how margins die.</li>
+      <li><b>Care plan is month-to-month.</b> Long contracts signal distrust at this buyer size; the number on the monthly page is the real retention tool.</li>
+      <li><b>Anchor on the alternative:</b> a $45k/yr ops hire, or the revenue a missed quote never books. The fee is trivial next to either.</li>
+    </ul></div>
+    <div class="panel"><ul class="tight">
+      <li><b>Discounted pilots:</b> first three clients can get a reduced X-ray (e.g. $500) in exchange for a written outcome and a referral — still paid, never free.</li>
+      <li><b>Price ceilings to watch:</b> commodity automation shops quote $300–2,000 per workflow. Don't compete on price — compete on being embedded, local, and accountable for the result.</li>
+      <li><b>Walk-away test:</b> an owner who won't pay $750 to see their own operation clearly was never going to pay for the fix.</li>
+    </ul></div>
+  </div>
+</div>
+</main>
+
+<!-- ============ DELIVERY ============ -->
+<main class="page" id="page-delivery">
+<div class="wrap">
+  <div class="kicker">Delivery · the process</div>
+  <h1>How an engagement actually runs</h1>
+  <p class="lede">Adapted from the enterprise FDE lifecycle and compressed for small businesses: shorter cycles, the owner as buyer, one workflow per deployment. The sequence is the same at every size — <b>learn, build, ship, transfer</b> — just faster and in plain English.</p>
+
+  <div class="sechead"><h2>The five phases</h2><span class="note">~6 weeks end to end</span></div>
+  <div class="grid g2">
+    <div class="panel"><h3>1 · Dip <span class="flag">week 1</span></h3><p>Embedded observation, not interviews-from-a-slideware. Sit where the work happens, watch for repetition (copy-paste between tools, tab-switching, the phone pulled out mid-task), and ask the morning question: <b>"What's the most annoying part of your day?"</b> Customers describe solutions; the dip finds the problem underneath. End with the ranked X-ray.</p></div>
+    <div class="panel"><h3>2 · Pick <span class="flag">end of week 1</span></h3><p>Choose ONE workflow with the owner. Selection rule: high frequency, low judgment, measurable today. Capture the baseline number <b>before</b> building anything (minutes per quote, missed calls per week, days-to-get-paid) — it becomes the acceptance test and the monthly-page metric.</p></div>
+    <div class="panel"><h3>3 · Build <span class="flag">weeks 2–4</span></h3><p>Ship something rough on real data inside the first week of build — a working artifact beats a proposal deck. Then harden: edge cases, error handling, fallback to the human process. Anything shipped must survive the 2am test: <i>would I want this running unattended in six months?</i></p></div>
+    <div class="panel"><h3>4 · Transfer <span class="flag">final week</span></h3><p>Train the person on their side who owns it. Deliver a one-page runbook: what it does, when it breaks, what to do, who to call. The system runs without heroics. If only the builder can operate it, it isn't done.</p></div>
+    <div class="panel"><h3>5 · Care <span class="flag">ongoing</span></h3><p>First weeks in production are when things wobble — stay close, fix fast, log everything. Then settle into the monthly rhythm: the one-page number, small improvements, and the next-use-case conversation off the X-ray's ranked list.</p></div>
+    <div class="panel" style="background:#e8ecd9"><h3>The measurement habit</h3><p>Every engagement carries three numbers end to end: <b>baseline</b> (captured in the dip), <b>acceptance test</b> (agreed before build), <b>monthly metric</b> (what the owner sees every month). No number, no deployment.</p></div>
+  </div>
+
+  <div class="sechead"><h2>Per-engagement checklist</h2><span class="note">run before every ship</span></div>
+  <div class="grid g2">
+    <div class="panel"><ul class="tight">
+      <li>Baseline metric captured from their real data, not an estimate</li>
+      <li>Acceptance test written down and agreed before the build starts</li>
+      <li>Fallback defined: what happens when the system fails at 7pm Saturday</li>
+      <li>Kill switch exists and someone on their side has actually tested it</li>
+    </ul></div>
+    <div class="panel"><ul class="tight">
+      <li>Named owner on the customer side, trained, with the runbook</li>
+      <li>Scope exclusions written down — what this deployment does NOT touch</li>
+      <li>New problems discovered mid-build get logged as findings, not absorbed silently</li>
+      <li>2am test passed: safe to run unattended, observability on, cost per run known</li>
+    </ul></div>
+  </div>
+
+  <div class="warn" style="margin-top:22px">Drift alarm: if a deployment starts sounding like "a few hours a week of ongoing help," it is becoming staff augmentation. Re-anchor to the three payments: X-ray, deployment, care plan — and quote the extra work fresh.</div>
+</div>
+</main>
+
+<!-- ============ POSITIONING & GTM ============ -->
+<main class="page" id="page-gtm">
+<div class="wrap">
+  <div class="kicker">Positioning &amp; GTM</div>
+  <h1>Never say FDE. Say what changes for them.</h1>
+  <p class="lede">"Forward-deployed engineer" is the internal operating model, not the message. Owners don't buy job titles — they buy "the quoting bottleneck stops costing you jobs." Position in outcomes, sell by geography, walk in like a neighbor.</p>
+
+  <div class="sechead"><h2>Positioning options</h2><span class="note">pick one, test it</span></div>
+  <div class="grid g2">
+    <div class="panel"><h3>Primary candidate</h3><p><b>"I build and run the systems local businesses keep meaning to fix."</b> Plain, outcome-first, no AI worship, no consulting jargon. The word "run" quietly carries the care plan.</p></div>
+    <div class="panel"><h3>Supporting lines</h3><ul class="tight">
+      <li>"Fixed price. Live in your business in under a month. I stay on to keep it working."</li>
+      <li>"You don't need another software demo. You need Monday morning to go differently."</li>
+      <li>"Your competitor quotes in 3 minutes. Let's make that you."</li>
+    </ul></div>
+  </div>
+  <div class="rule" style="margin-top:14px">Naming rules: <b>no "AI consultant"</b> (triggers agency-spam reflex and invites price comparison), <b>no "digital transformation"</b> (consultant fog), <b>no "automation agency"</b> (commodity anchor). Say systems, workflows, Monday morning.</div>
+
+  <div class="sechead"><h2>Geography-first GTM</h2><span class="note">Jacksonville · NE Florida</span></div>
+  <div class="grid g3">
+    <div class="panel"><h3>Warm first</h3><p>Own network → Chamber of Commerce, BNI, trade associations, the business journal lists. The first three clients should come from people who already trust the face.</p></div>
+    <div class="panel"><h3>Show up</h3><p>The edge over every remote agency: walk-ins and site visits. Sit in the dispatch office. Watch the counter at 8am. "Residents get the truth" — and being local makes that possible.</p></div>
+    <div class="panel"><h3>One-page site</h3><p>Not a portfolio. One page: what changes for you, how it works (3 steps), fixed pricing ranges, who I am, book a call. The X-ray is the call-to-action.</p></div>
+  </div>
+
+  <div class="sechead"><h2>The conversation sequence</h2><span class="note">owner to owner</span></div>
+  <div class="grid g2">
+    <div class="panel"><ul class="tight">
+      <li><b>Open with their operation, never with AI or a pitch.</b> "How does quoting work on a busy week?" beats any deck.</li>
+      <li><b>Ask the morning question.</b> Everyone has a most-annoying part of the day. That's the door.</li>
+      <li><b>Diagnose lightly, sell the X-ray.</b> If the pain is real: "This is exactly what my assessment is for — one week, $750, you get the map and a fixed quote, and it credits into the fix."</li>
+      <li><b>Price on the call.</b> Ranges are public; the quote is earned by the X-ray.</li>
+    </ul></div>
+    <div class="panel"><ul class="tight">
+      <li><b>Referral loop built into step 3:</b> every deployment ends with a written outcome and a request for one introduction to another owner.</li>
+      <li><b>Dream 50 list</b> over cold blasts: 50 named owner-operated businesses in the metro, worked by hand, in person where possible.</li>
+      <li><b>Proof compounds locally:</b> one well-known Jacksonville business running your system is worth more than any ad budget.</li>
+    </ul></div>
+  </div>
+
+  <div class="warn">Boundary: conversations diagnose fit; they never deliver the assessment. The moment a call starts producing "what I would do is…" — stop and sell the X-ray. Free strategy on a sales call is the classic way this model dies.</div>
+</div>
+</main>
+
+<!-- ============ VERTICALS ============ -->
+<main class="page" id="page-verticals">
+<div class="wrap">
+  <div class="kicker">Verticals</div>
+  <h1>Where the pain lives — 8 lanes, researched</h1>
+  <p class="lede">Geography decides <i>who</i>; these cards decide <i>what to fix first</i>. Each card: the recurring operational pain, concrete deployments (problem → build → why the owner pays), and who signs. Comparative table at the bottom. Treat pain lists as research-backed hypotheses until an X-ray confirms them in a real business.</p>
+
+  <div class="vcards" style="margin-top:24px">
+
+    <div class="vcard"><h3>Freight brokers / 3PLs <span class="flag green">strong lane</span></h3>
+      <div class="who">signs: owner / president · ops manager as champion</div>
+      <div class="uc"><b>Slow spot quoting.</b> Manual RFQ handling runs 15–45 min; competitors quoting in under 3 win the load. <span class="arrow">→</span> AI parses inbound RFQ emails, pulls lane rates, drafts the quote for one-click send. <span class="arrow">→</span> Speed-to-quote is literally win rate.</div>
+      <div class="uc"><b>Inbox triage.</b> 3–4 hrs/day reading rate requests in dozens of formats. <span class="arrow">→</span> Email parser that extracts load details into the TMS/spreadsheet, ranked reply queue. <span class="arrow">→</span> Hours back daily, fewer re-keying errors ($150–400 per error reported).</div>
+      <div class="uc"><b>POD chasing &amp; invoicing lag.</b> Delivery-to-invoice stretches 5–10 days; aging receivables follow. <span class="arrow">→</span> Automated POD collection nudges + invoice-ready packet the day of delivery. <span class="arrow">→</span> Faster cash, fewer disputes.</div>
+      <div class="uc"><b>Carrier vetting &amp; check calls.</b> Manual MC checks, dozens of "where's my truck" calls. <span class="arrow">→</span> Automated compliance screening + status digest for customers. <span class="arrow">→</span> Fraud catches alone can cover the fee (reported in case studies).</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Case-study claims: 18–20 staff hrs/wk on 3 workflows (12-person broker); time-per-load 47→6 min with AI triage. Dense in Jax: JAXPORT, CSX, I-10/I-95.</p>
+    </div>
+
+    <div class="vcard"><h3>Construction &amp; trades <span class="flag green">strong lane</span></h3>
+      <div class="who">signs: owner / GM · estimating is the pain center</div>
+      <div class="uc"><b>Bids go out late or never.</b> Everything runs through the owner; a ramped-up job stalls estimating and follow-up. <span class="arrow">→</span> Lead intake + bid pipeline tracker with automatic follow-up nudges until a yes/no. <span class="arrow">→</span> Bids not followed up are margin never collected.</div>
+      <div class="uc"><b>Estimates rebuilt by hand.</b> Material quantities are "a shot in the dark" for many small contractors; one missed line item can erase a job's profit on 2–6% net margins. <span class="arrow">→</span> Estimate template engine fed from their own completed-job data; second-eyes checklist before submission. <span class="arrow">→</span> Directly protects the year's profit.</div>
+      <div class="uc"><b>Change orders never billed.</b> Field work creates costs; paperwork lags; unbilled change orders vanish. <span class="arrow">→</span> Photo + note intake from the field that auto-drafts the change order for approval. <span class="arrow">→</span> Recovered revenue, zero new headcount.</div>
+      <div class="uc"><b>Subs &amp; schedules out of sequence.</b> <span class="arrow">→</span> Simple scheduling board + automated confirmations and reminders. <span class="arrow">→</span> Timeline and budget stop leaking.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Highest-leverage generic workflow: quote/estimate speed + follow-up. Same deployment pattern repeats across roofing, plumbing, HVAC, electrical.</p>
+    </div>
+
+    <div class="vcard"><h3>Healthcare practices <span class="flag">careful lane</span></h3>
+      <div class="who">signs: owner-dentist / practice administrator · HIPAA sets the rules</div>
+      <div class="uc"><b>Front desk drowns in the same 50 calls.</b> "Do you take my insurance?" all day, missed after-hours calls. <span class="arrow">→</span> AI receptionist (HIPAA-scoped) for insurance FAQs, scheduling, after-hours intake with human escalation. <span class="arrow">→</span> Every missed call is a lost new patient.</div>
+      <div class="uc"><b>No-shows &amp; empty chairs.</b> <span class="arrow">→</span> Automated reminder/waitlist-backfill sequence. <span class="arrow">→</span> Chair time is the entire revenue engine.</div>
+      <div class="uc"><b>Insurance verification by hand.</b> Eligibility checked manually before visits. <span class="arrow">→</span> Automated eligibility check before appointment, exceptions flagged to staff. <span class="arrow">→</span> Fewer claim denials, less front-desk scramble.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Real money but regulated: scope tightly, human review on anything clinical, BAA-ready tooling only. Existing packaged competitors here — differentiate on being local and integrated with THEIR practice system.</p>
+    </div>
+
+    <div class="vcard"><h3>Marine / marinas / boat dealers <span class="flag green">local edge lane</span></h3>
+      <div class="who">signs: owner / service manager</div>
+      <div class="uc"><b>Service on a whiteboard.</b> Estimates, work orders, parts and tech time tracked loosely; status is tribal knowledge. <span class="arrow">→</span> Estimate → work-order → invoice pipeline with customer status updates by text. <span class="arrow">→</span> Boat owners judge yards on communication.</div>
+      <div class="uc"><b>Slow estimate approvals.</b> Paper estimates sit unsigned while the boat sits in the well. <span class="arrow">→</span> Text/email estimate with one-tap approval. <span class="arrow">→</span> Faster approvals = more billed hours per month.</div>
+      <div class="uc"><b>Missed after-hours calls.</b> Boating is weekends; the phone rings when nobody's there. <span class="arrow">→</span> After-hours AI intake that qualifies and books. <span class="arrow">→</span> Captures the work that currently evaporates.</div>
+      <div class="uc"><b>Seasonal cash lumps.</b> <span class="arrow">→</span> Simple utilization + quoting dashboard to price the season properly. <span class="arrow">→</span> Margin discipline in a lumpy business.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Jax is a major boating market; many operators run on paper. The NE Florida supply scan already mapped this space (36 operators). Niche enough that no big competitor bothers.</p>
+    </div>
+
+    <div class="vcard"><h3>Equipment rental &amp; dealers <span class="flag">ops-heavy lane</span></h3>
+      <div class="who">signs: owner / rental manager</div>
+      <div class="uc"><b>Idle here, shortage there.</b> No utilization visibility across sites. <span class="arrow">→</span> Fleet utilization dashboard from existing records. <span class="arrow">→</span> Idle equipment is dead ROI.</div>
+      <div class="uc"><b>Damage disputes.</b> No condition documentation before/after. <span class="arrow">→</span> Photo-in / photo-out check-in workflow with dispute file. <span class="arrow">→</span> Kills the recurring arguments and write-offs.</div>
+      <div class="uc"><b>Billing disputes on hours.</b> Usage not tracked accurately. <span class="arrow">→</span> Meter/hours logging feeding invoices. <span class="arrow">→</span> Direct revenue recovery.</div>
+      <div class="uc"><b>Quote &amp; reservation friction.</b> Manual reservation book, phone-tag confirmations. <span class="arrow">→</span> Intake → availability check → reservation confirmation automation. <span class="arrow">→</span> Renter goes to whoever confirms first.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Pairs naturally with the construction lane — same customers, complementary buyers.</p>
+    </div>
+
+    <div class="vcard"><h3>Professional services (law / accounting / insurance) <span class="flag">non-billable-hours lane</span></h3>
+      <div class="who">signs: managing partner / owner · sensitivity: client confidentiality</div>
+      <div class="uc"><b>Intake is a Sisyphean chain.</b> Every callback spawns follow-ups, forms, scheduling, conflict checks. A missed callback = lost engagement. <span class="arrow">→</span> Automated intake sequence: form, conflict-search prep, engagement letter draft for approval. <span class="arrow">→</span> Prospects convert or vanish within days.</div>
+      <div class="uc"><b>Document chasing.</b> The third reminder about a missing tax slip, files renamed by hand. <span class="arrow">→</span> Document request + filing agent with a self-updating checklist. <span class="arrow">→</span> Deadlines stop slipping.</div>
+      <div class="uc"><b>Non-billable back office.</b> Bills typed into QuickBooks, invoices built at month-end by a partner. <span class="arrow">→</span> Bill capture + draft invoice generation for review. <span class="arrow">→</span> Invoices go out on time; cash follows.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Framing that lands: "more of the day on billable work." Watch confidentiality posture; keep humans in every judgment loop.</p>
+    </div>
+
+    <div class="vcard"><h3>Property management <span class="flag green">proven playbook lane</span></h3>
+      <div class="who">signs: owner / principal · 50–300 unit shops are the sweet spot</div>
+      <div class="uc"><b>Maintenance triage chaos.</b> 5–6 manual steps per request; poor response drives non-renewals. <span class="arrow">→</span> Structured intake (form/photos) → urgency classification → vendor dispatch → tenant status texts. <span class="arrow">→</span> Response time is the retention lever.</div>
+      <div class="uc"><b>Awkward rent chasing.</b> Manual reminders, inconsistent timing. <span class="arrow">→</span> Tiered arrears sequence (day 3/7/10) with escalation summary. <span class="arrow">→</span> Reported arrears cut roughly in half; ~5 hrs/wk back.</div>
+      <div class="uc"><b>Owner reporting by hand.</b> Monthly statements rebuilt every month. <span class="arrow">→</span> Automated monthly owner packet from existing data. <span class="arrow">→</span> Wins renewals and referrals from landlord clients.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Industry time studies: ~86 manual hrs/mo per office → ~82% automatable. Well-documented vertical with clear before/after numbers — easy to prove value fast.</p>
+    </div>
+
+    <div class="vcard"><h3>Restaurants &amp; hospitality <span class="flag">thin-margin lane</span></h3>
+      <div class="who">signs: owner-operator · price sensitivity is real</div>
+      <div class="uc"><b>10–15 hrs/wk of owner admin.</b> Scheduling (4–6h), inventory counts (3–4h), vendor calls (2–3h), reviews, reconciliation. <span class="arrow">→</span> Demand-driven schedule drafts + inventory par automation off POS data. <span class="arrow">→</span> Labor is 25–35% of sales; food cost 25–35%; small % wins are real money.</div>
+      <div class="uc"><b>Waste &amp; stockouts.</b> Over-order basil or 86 the salmon Saturday. <span class="arrow">→</span> Par-level monitoring + reorder drafts for approval. <span class="arrow">→</span> Reported 20–30% waste reduction.</div>
+      <div class="uc"><b>Review response lag.</b> <span class="arrow">→</span> Draft-review-approve response agent across Google/Yelp. <span class="arrow">→</span> Reputation maintenance for 20 min/day.</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px">Highest pain, lowest ability to pay. Use for volume/practice, not for margin — or target 2–4 location groups instead of single units.</p>
+    </div>
+
+  </div>
+
+  <div class="sechead"><h2>Comparative read</h2><span class="note">hypothesis, verify in the field</span></div>
+  <table class="cmp">
+    <tr><th>Vertical</th><th>Pain intensity</th><th>Pays without pain</th><th>Build difficulty</th><th>Who signs</th><th>Note</th></tr>
+    <tr><td>Freight / 3PL</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td>Owner/president</td><td>Jax-dense; speed-to-quote is a provable win-rate story</td></tr>
+    <tr><td>Construction / trades</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></td><td>Owner/GM</td><td>Estimating + follow-up; margins thin so ROI talk lands</td></tr>
+    <tr><td>Property management</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td>Owner/principal</td><td>Most documented before/after numbers; fastest proof</td></tr>
+    <tr><td>Marine / marinas</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td>Owner / service mgr</td><td>Local edge strongest; big competitors ignore it</td></tr>
+    <tr><td>Equipment rental</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td>Owner / rental mgr</td><td>Utilization + dispute stories; pairs with construction</td></tr>
+    <tr><td>Professional services</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></td><td>Managing partner</td><td>Best hourly-rate math; slower cycles, confidentiality care</td></tr>
+    <tr><td>Healthcare practices</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td>Owner-dentist / admin</td><td>Big budgets, HIPAA overhead, packaged competitors</td></tr>
+    <tr><td>Restaurants</td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></td><td><span class="dotrow"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></td><td>Owner-operator</td><td>Practice ground, not margin; target multi-unit groups</td></tr>
+  </table>
+
+  <div class="rule" style="margin-top:20px">Generic workflows that repeat everywhere (build once, sell many): <b>after-hours call intake · quote/estimate generation + follow-up · document &amp; AR chasing · scheduling/dispatch · the monthly one-page number.</b> Vertical-specific work is mostly the data plumbing. Pick a lane by who you can sit across from, not by the technology.</div>
+</div>
+</main>
+
+<!-- ============ FDE PLAYBOOK ============ -->
+<main class="page" id="page-fde">
+<div class="wrap">
+  <div class="kicker">FDE Playbook · learn the craft</div>
+  <h1>How forward deployment works, and how it shrinks to one person</h1>
+  <p class="lede">The model was invented at Palantir (~2005) because their first customers' problems couldn't be solved from a vendor HQ: engineers embedded at the customer site, built working software against real problems in weeks, and fed what they learned back into the core product. OpenAI, Anthropic, Accenture/Microsoft, EY and BCG are all running versions of it now. None of it requires a platform — it requires proximity and the nerve to ship small.</p>
+
+  <div class="sechead"><h2>The core loop</h2><span class="note">every deployment, every size</span></div>
+  <div class="grid g2">
+    <div class="panel"><h3>Learn → Build → Ship → Transfer</h3><p>The whole craft is one loop. <b>Learn:</b> embedded observation where the work happens. <b>Build:</b> a working artifact on real data fast. <b>Ship:</b> hardened, monitored, with a runbook. <b>Transfer:</b> their team can operate it. Then loop again on the next problem. Enterprise FDEs run it over quarters; a solo operator runs it in weeks.</p></div>
+    <div class="panel"><h3>Ship on day one</h3><p>Palantir's internal phrase. A new FDE delivers something working inside the first week — a transform, a dashboard, an alert. It rejects two patterns at once: the consultant (90 days of discovery, deliver a deck) and the solutions engineer (demo, then hand off to someone else). A working tool by Friday beats a roadmap by Q3.</p></div>
+  </div>
+
+  <div class="sechead"><h2>Twelve operating principles</h2><span class="note">distilled from practitioner sources</span></div>
+  <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;box-shadow:var(--shadow)">
+    <div class="pr"><span class="num">01</span><div><b>Be in the room.</b><p>The most valuable intelligence is never in documents. Watch for repetition — any task done more than once a day is a signal. Copy-paste between tools, tab-switching, the phone pulled out mid-workflow.</p></div></div>
+    <div class="pr"><span class="num">02</span><div><b>Ask the morning question.</b><p>"What's the most annoying part of your day?" Everyone has an answer, and it's the door to the real problem.</p></div></div>
+    <div class="pr"><span class="num">03</span><div><b>Customers describe solutions; find the problem.</b><p>The 47-page requirements doc that collapsed into one Slack alert ("I check if trucks are late, then I call the team"). The XY problem is everywhere. Whoever defines the problem owns the solution.</p></div></div>
+    <div class="pr"><span class="num">04</span><div><b>Ship the small thing immediately.</b><p>If the fix is under a day of work, build and ship it this week. Close the loop, earn trust, then discover the problem worth generalizing. Don't make it a product strategy.</p></div></div>
+    <div class="pr"><span class="num">05</span><div><b>Start with the outcome.</b><p>OpenAI's FDE team motto: "Start with the outcome, do what it takes, then follow with scale." Define the business value first — cost, time, revenue, experience — then work back to the build.</p></div></div>
+    <div class="pr"><span class="num">06</span><div><b>Prove it in production.</b><p>An impressive demo goes a long way before anyone asks if it survives the real world. Put a useful system in people's hands, learn from real use, improve each iteration. Demos lie; production doesn't.</p></div></div>
+    <div class="pr"><span class="num">07</span><div><b>Ship everything like it runs for 18 months.</b><p>Because it probably will. The 2am test: would I want a call about this in six months? Observability, fallback, runbook — or it isn't shippable.</p></div></div>
+    <div class="pr"><span class="num">08</span><div><b>You don't need the industry on day one — learning it is your job.</b><p>OpenAI FDEs embedded with chip-verification teams they'd never seen. Domain curiosity beats domain history; in weeks you'll ask questions the insiders stopped asking.</p></div></div>
+    <div class="pr"><span class="num">09</span><div><b>Make success repeatable.</b><p>Package what worked: templates, runbooks, evals. OpenAI cut ~90% of custom code by rebuilding on shared primitives — one deployment took 2 months, the second team took a day. Your playbook library is the compounding asset.</p></div></div>
+    <div class="pr"><span class="num">10</span><div><b>Make yourself obsolete on purpose.</b><p>Train the customer's team, hand over the runbook, step back. Obsolescence per engagement is why they trust you with the next one — and why referrals happen.</p></div></div>
+    <div class="pr"><span class="num">11</span><div><b>Refuse the systems-integrator role.</b><p>Palantir walked away from "Accenture with better software" contracts. Staff augmentation kills the model: you ship systems and transfer ownership, you don't sell bodies.</p></div></div>
+    <div class="pr"><span class="num">12</span><div><b>Field reality votes.</b><p>At Palantir, FDE observations shaped the product weekly. Solo translation: every engagement should leave your playbook smarter — the workflow, the checklist, the pricing note. The next client starts further ahead.</p></div></div>
+  </div>
+
+  <div class="sechead"><h2>Failure modes</h2><span class="note">how this model dies</span></div>
+  <div class="grid g2">
+    <div class="panel"><h3>Becoming staff augmentation</h3><p>Endless "small tasks," hourly blur, no transfer. You're a contractor with extra steps. Guard: fixed scope, three-payment model, transfer phase mandatory.</p></div>
+    <div class="panel"><h3>Skipping discovery</h3><p>Jumping to prototyping before mapping the real problem builds the wrong thing fast. Guard: the dip phase and the baseline number come before any build.</p></div>
+    <div class="panel"><h3>Free discovery trap</h3><p>Prospects extract your diagnosis and give the build to a cheap freelancer. Guard: paid X-ray, "give away credibility, charge for diagnosis, charge more for implementation."</p></div>
+    <div class="panel"><h3>Tech-first instead of problem-first</h3><p>Leading with agents and tools produces demos without buyers. Guard: open with their operation, never the stack. "AI" is an implementation detail they may never need to hear.</p></div>
+    <div class="panel"><h3>The unowned hack</h3><p>A script in production nobody can operate when it breaks. Guard: runbook + trained owner on their side + tested fallback, or it doesn't ship.</p></div>
+    <div class="panel"><h3>Hero dependence</h3><p>Only the builder can fix it. That's a liability, not leverage. Guard: documentation and handoff are the definition of done.</p></div>
+  </div>
+
+  <div class="sechead"><h2>Enterprise → solo translation</h2><span class="note">what changes at SMB scale</span></div>
+  <table class="cmp">
+    <tr><th>Dimension</th><th>Enterprise FDE</th><th>Solo, small-business version</th></tr>
+    <tr><td>Embed length</td><td>8–16 weeks to quarters</td><td>1-week X-ray, 2–4 week build</td></tr>
+    <tr><td>Buyer</td><td>VP/C-suite with procurement</td><td>The owner, one meeting, yes/no</td></tr>
+    <tr><td>Contract</td><td>Seven figures, platform-attached</td><td>$750 X-ray → $2.5–7.5k deployment → $300–800/mo care</td></tr>
+    <tr><td>Ontology</td><td>Formal data model in Foundry</td><td>A clean spreadsheet schema and shared vocabulary</td></tr>
+    <tr><td>Eval harness</td><td>CI-blocking golden set</td><td>The acceptance test + the monthly number</td></tr>
+    <tr><td>Staged rollout</td><td>Shadow → canary → ramp</td><td>Run alongside the old process for 2 weeks, then switch</td></tr>
+    <tr><td>Product feedback</td><td>Feeds the platform roadmap</td><td>Feeds your playbook library and the next client</td></tr>
+  </table>
+
+  <div class="sechead"><h2>Sources</h2><span class="note">read the originals</span></div>
+  <div class="panel srcs"><ul class="tight">
+    <li><a href="https://getperspective.ai/blog/palantir-forward-deployed-engineering-playbook-anthropic-openai-copying">Palantir's FDE playbook — the original model Anthropic &amp; OpenAI are copying</a> (getperspective.ai) — origin, org lessons, AIP bootcamps, 7 recurring lessons</li>
+    <li><a href="https://forward-deployment-engineer.com/blog/palantir-fde-model-explained">The Palantir FDE model, explained without the Kool-Aid</a> — the economics loop; "at normal-company scale" compression</li>
+    <li><a href="https://shaam.blog/articles/forward-deployed-engineering-product-strategy-guide">FDE as a product strategy</a> (shaam.blog) — the 47-page doc → Slack alert story; on-site playbook; ontology; ship-like-18-months</li>
+    <li><a href="https://openai.com/index/forward-deployed-engineering-means">What FDE means at OpenAI</a> (Colin Jarvis) — outcome-first, prove in production, make success repeatable, make yourself obsolete</li>
+    <li><a href="https://openai.com/business/forward-deployed-engineering/">OpenAI Forward Deployed Engineering</a> + <a href="https://openai.com/index/openai-launches-the-deployment-company/">DeployCo launch</a> — diagnostic-first engagement shape at scale</li>
+    <li><a href="https://fde.academy/blog/forward-deployed-engineer-playbook">The FDE playbook, six phases</a> (FDE Academy) — discovery → MVP scoping → prototype on real data → eval harness → rollout → feedback loop</li>
+    <li><a href="https://startuptrio.com/articles/how-to-pitch-and-price-paid-discovery-phase">How to pitch and price a paid discovery phase</a> (startuptrio) — free-architecture ambush, discovery pricing mechanics, credit-toward-build</li>
+    <li><a href="https://freelancerecovery.com/stop-giving-away-free-strategy-on-sales-call">Stop giving away free strategy on sales calls</a> — credibility vs. diagnosis vs. implementation firewall</li>
+    <li><a href="https://www.pymnts.com/artificial-intelligence-2/2026/adoption-was-ais-problem-now-its-a-business-model/">FDE as the industry's answer to the deployment gap</a> (PYMNTS) — 800% job-growth signal; Accenture/Microsoft, EY, BCG copies</li>
+  </ul></div>
+</div>
+</main>
+
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+function show(id){
+  tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.page===id)));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+id));
+  window.scrollTo({top:0});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.page)));
+</script>
+</body>
+</html>
