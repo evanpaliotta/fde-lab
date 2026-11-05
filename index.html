@@ -117,6 +117,7 @@ table.cmp tr:last-child td{border-bottom:none}
       <button class="tab" role="tab" aria-selected="false" data-page="gtm">Positioning &amp; GTM</button>
       <button class="tab" role="tab" aria-selected="false" data-page="verticals">Verticals</button>
       <button class="tab" role="tab" aria-selected="false" data-page="fde">FDE Playbook</button>
+      <button class="tab" role="tab" aria-selected="false" data-page="resources">Research &amp; Names</button>
     </nav>
   </div>
 </div>
@@ -263,7 +264,7 @@ table.cmp tr:last-child td{border-bottom:none}
       <li>"Your competitor quotes in 3 minutes. Let's make that you."</li>
     </ul></div>
   </div>
-  <div class="rule" style="margin-top:14px">Naming rules: <b>no "AI consultant"</b> (triggers agency-spam reflex and invites price comparison), <b>no "digital transformation"</b> (consultant fog), <b>no "automation agency"</b> (commodity anchor). Say systems, workflows, Monday morning.</div>
+  <div class="rule" style="margin-top:14px">Customer-facing language: <b>lead with the problem and the outcome</b>, not “workflow,” automation, or a technical job title. For example: “Respond to inquiries faster and more precisely so you can win more business.” Explain AI transparently when it is relevant.</div>
 
   <div class="sechead"><h2>Geography-first GTM</h2><span class="note">Jacksonville · NE Florida</span></div>
   <div class="grid g3">
@@ -450,6 +451,51 @@ table.cmp tr:last-child td{border-bottom:none}
     <li><a href="https://freelancerecovery.com/stop-giving-away-free-strategy-on-sales-call">Stop giving away free strategy on sales calls</a> — credibility vs. diagnosis vs. implementation firewall</li>
     <li><a href="https://www.pymnts.com/artificial-intelligence-2/2026/adoption-was-ais-problem-now-its-a-business-model/">FDE as the industry's answer to the deployment gap</a> (PYMNTS) — 800% job-growth signal; Accenture/Microsoft, EY, BCG copies</li>
   </ul></div>
+</div>
+</main>
+
+<!-- ============ RESEARCH & NAMES ============ -->
+<main class="page" id="page-resources">
+<div class="wrap">
+  <div class="kicker">Research · 5 November 2026</div>
+  <h1>Build once. Adapt to each business.</h1>
+  <p class="lede">A portfolio of reusable systems for common customer problems, plus a playbook to run Deploy Lab itself. These are research starting points—not systems we have built, tested or sold.</p>
+  <div class="rule">The outcome may repeat across HVAC and boat cleaning; their software, access, data quality, edge cases and customer expectations may not. Test and adapt each installation.</div>
+  <div class="sechead"><h2>Client systems</h2><span class="note">starting portfolio · ideas, not promises</span></div>
+  <div class="grid g2">
+    <div class="panel"><h3>Win more opportunities</h3><p>Respond to inquiries faster; keep quotes moving; route requests to the right person. Measure response time and follow-up coverage.</p></div>
+    <div class="panel"><h3>Keep customers informed</h3><p>Provide status updates, scheduling confirmations, and answers grounded in approved information, with a clear route to a person.</p></div>
+    <div class="panel"><h3>Get paid and reduce admin</h3><p>Prepare invoice reminders, collect documents, and reduce repeat data entry. Keep billing decisions and exceptions with the owner.</p></div>
+    <div class="panel"><h3>See what needs attention</h3><p>Turn scattered information into an owner-facing summary and flag problems before they become surprises.</p></div>
+  </div>
+  <div class="sechead"><h2>Client systems: templates and examples</h2><span class="note">click through to originals</span></div>
+  <div class="panel"><ul class="tight">
+    <li><a href="https://github.com/kuliberdalabs/n8n-sme-workflows">Kuliberda Labs: SME template library</a> — importable examples for lead intake, billing reminders, document collection, support triage and onboarding. Some templates are Poland-specific; assess each before use.</li>
+    <li><a href="https://n8n.io/workflows/17741/">SME lead intake template</a> — incoming requests, validation, routing and internal alerts. Example to adapt, not a finished product.</li>
+    <li><a href="https://n8n.io/workflows/17988/">Support triage and FAQ drafts</a> — route issues and draft responses for review rather than automatically sending them.</li>
+    <li><a href="https://n8n.io/workflows/18054/">Invoice reminder template</a> — example reminder process with a check for already-paid invoices.</li>
+    <li><a href="https://gist.github.com/financiallywelloff-cmyk/db258fcc83e4a423466c72ce50e8c5f8">Lead qualification with human approval</a> — starter JSON with sample data; its AI scoring step is a stub that must be replaced.</li>
+    <li><a href="https://github.com/huabeitech/cs-ai-agent">AgentDesk customer support project</a> — open-source support desk with a knowledge base and human handoff. Larger self-hosted project, not a turnkey SMB solution.</li>
+    <li><a href="https://n8n.io/workflows/9307">Zoho Desk ticket classification</a> — example of routing support requests; requires Zoho Desk and a compatible model provider.</li>
+  </ul></div>
+  <div class="sechead"><h2>Running Deploy Lab</h2><span class="note">owner conversations stay human</span></div>
+  <div class="panel"><ul class="tight">
+    <li><a href="https://zapier.com/blog/lead-management-automation">Zapier: lead management guide</a> — routes, follow-up, meeting preparation and post-conversation actions. Useful for Deploy Lab and clients; vendor-specific examples.</li>
+    <li><a href="https://n8n.io/workflows/7221-automated-sales-follow-up-with-gpt-tavily-research-and-gmail/">Inbound research and follow-up template</a> — form → research → email; sends automatically by default. Add review first; community nodes require self-hosted n8n.</li>
+    <li><a href="https://github.com/fom-dev/company-in-a-box/blob/main/playbooks/client-onboarding.md">Client onboarding checklist</a> — kickoff agenda, access, success measures and escalation. Simplify the multi-role assumptions for a solo operator.</li>
+    <li><a href="https://www.quivly.ai/blog/fde-implementation-to-adoption-handoff">Implementation-to-adoption handoff</a> — exit criteria, runbook, post-launch care and issue ownership. Written for larger teams; adapt to solo service.</li>
+    <li><a href="https://github.com/Dragoon0x/agency-sharp">Agency operating system reference</a> — broad library covering positioning, scoping, delivery and handoff. Large and unvalidated here; mine selectively rather than installing blindly.</li>
+  </ul></div>
+  <p class="warn" style="margin-top:16px">Templates are untested third-party material. Review permissions, data handling, licensing, costs and failure paths. Test on sample data; keep approvals and human escalation where consequences warrant them.</p>
+  <div class="sechead"><h2>Business names</h2><span class="note">shortlist · not selected</span></div>
+  <p>Initial .com checks on 5 November 2026: the Verisign registry returned “not found” for each domain below. This suggests it is unregistered, not a guarantee of availability or price. Confirm with a registrar immediately before purchase; conduct Florida business-name and trademark checks before choosing. Nothing has been purchased.</p>
+  <div class="grid g2">
+    <div class="panel"><h3>Betterday Local</h3><p>Friendly, outcome-oriented and rooted in the community. <a href="https://rdap.verisign.com/com/v1/domain/betterdaylocal.com">betterdaylocal.com</a></p></div>
+    <div class="panel"><h3>Steadyshore Partners</h3><p>Steady and local without limiting the work to one industry. <a href="https://rdap.verisign.com/com/v1/domain/steadyshorepartners.com">steadyshorepartners.com</a></p></div>
+    <div class="panel"><h3>Frontshore Partners</h3><p>Coastal and businesslike; a little more formal. <a href="https://rdap.verisign.com/com/v1/domain/frontshorepartners.com">frontshorepartners.com</a></p></div>
+    <div class="panel"><h3>Firstwake Partners</h3><p>Forward movement with a subtle water connection. Similar-sounding businesses exist; investigate further. <a href="https://rdap.verisign.com/com/v1/domain/firstwakepartners.com">firstwakepartners.com</a></p></div>
+  </div>
+  <p class="mono" style="margin-top:18px">Initial exact-name web searches found no obvious exact match for the first three; search results are not trademark clearance. Registry links show the live response, which can change.</p>
 </div>
 </main>
 
